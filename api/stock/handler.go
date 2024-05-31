@@ -1,28 +1,28 @@
-package expense
+package stock
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
 
-	"github.com/IgorCooli/xpense/internal/business/model"
-	"github.com/IgorCooli/xpense/internal/business/service/expense"
+	"github.com/IgorCooli/minha-cozinha-be/internal/business/model"
+	"github.com/IgorCooli/minha-cozinha-be/internal/business/service/stock"
 	"github.com/gofiber/fiber/v3"
 )
 
 type handler struct {
-	service expense.Service
+	service stock.Service
 }
 
-func NewHandler(ctx context.Context, service expense.Service, app *fiber.App) handler {
+func NewHandler(ctx context.Context, service stock.Service, app *fiber.App) handler {
 
 	handler := handler{
 		service: service,
 	}
 
 	app.Get("/", handler.HelloWorld)
-	app.Get("/expense/search", handler.SearchExpenses)
-	app.Post("/expense", handler.AddExpense)
+	app.Get("/stock/search", handler.SearchStock)
+	app.Post("/stock", handler.AddStock)
 
 	return handler
 }
@@ -38,26 +38,21 @@ func (h handler) HelloWorld(c fiber.Ctx) error {
 	return nil
 }
 
-func (h handler) SearchExpenses(c fiber.Ctx) error {
+func (h handler) SearchStock(c fiber.Ctx) error {
 
-	month := c.Query("month")
-	year := c.Query("year")
+	name := c.Query("name")
 
-	if month == "" || year == "" {
-		panic("The query params are not complete")
-	}
-
-	result := h.service.Search(c.Context(), month, year)
+	result := h.service.Search(c.Context(), name)
 
 	c.JSON(result)
 	return nil
 }
 
-func (h handler) AddExpense(c fiber.Ctx) error {
-	var body model.Expense
+func (h handler) AddStock(c fiber.Ctx) error {
+	var body model.StockItem
 	json.Unmarshal(c.Body(), &body)
 
-	h.service.AddExpense(c.Context(), body)
+	h.service.AddStock(c.Context(), body)
 
 	return nil
 }

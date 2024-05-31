@@ -1,32 +1,33 @@
-package expense
+package stock
 
 import (
 	"context"
 
-	"github.com/IgorCooli/xpense/internal/business/model"
+	"github.com/IgorCooli/minha-cozinha-be/internal/business/model"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Repository interface {
-	InsertOne(ctx context.Context, expense model.Expense) error
-	InsertMany(ctx context.Context, expenses []model.Expense) error
-	Search(ctx context.Context, userId string, month string, year string) []model.Expense
+	InsertOne(ctx context.Context, expense model.StockItem) error
+	InsertMany(ctx context.Context, expenses []model.StockItem) error
+	Search(ctx context.Context, name string) []model.StockItem
 }
 
 func NewRepository(client *mongo.Client) Repository {
 	return mongoRepository{
-		expenseDB: client.Database("TCCMongoDB").Collection("expense"),
+		stockDB: client.Database("TCCMongoDB").Collection("stock"),
 	}
 }
 
 type mongoRepository struct {
-	expenseDB *mongo.Collection
+	stockDB *mongo.Collection
 }
 
-func (r mongoRepository) InsertOne(ctx context.Context, expense model.Expense) error {
+func (r mongoRepository) InsertOne(ctx context.Context, stockItem model.StockItem) error {
 
-	_, err := r.expenseDB.InsertOne(ctx, expense)
+	_, err := r.stockDB.InsertOne(ctx, stockItem)
 
 	if err != nil {
 		panic("Could not insert item")
@@ -35,14 +36,14 @@ func (r mongoRepository) InsertOne(ctx context.Context, expense model.Expense) e
 	return nil
 }
 
-func (r mongoRepository) InsertMany(ctx context.Context, expenses []model.Expense) error {
+func (r mongoRepository) InsertMany(ctx context.Context, expenses []model.StockItem) error {
 
 	var input []interface{}
 	for _, exp := range expenses {
 		input = append(input, exp)
 	}
 
-	_, err := r.expenseDB.InsertMany(ctx, input)
+	_, err := r.stockDB.InsertMany(ctx, input)
 	if err != nil {
 		panic("Could not insert items")
 	}
@@ -50,24 +51,26 @@ func (r mongoRepository) InsertMany(ctx context.Context, expenses []model.Expens
 	return nil
 }
 
-func (r mongoRepository) Search(ctx context.Context, userId string, month string, year string) []model.Expense {
-	var results []model.Expense
+func (r mongoRepository) Search(ctx context.Context, name string) []model.StockItem {
+	var results []model.StockItem
 
-	filter := bson.D{
-		{"card.userid", userId},
-		{"month", month},
-		{"year", year},
+	filter := bson.D{}
+
+	if name != "" {
+		filter = bson.D{
+			{"name", bson.M{"$regex": primitive.Regex{Pattern: name, Options: "i"}}},
+		}
 	}
 
-	cursor, err := r.expenseDB.Find(ctx, filter)
+	cursor, err := r.stockDB.Find(ctx, filter)
 	if err != nil {
-		return []model.Expense{}
+		return []model.StockItem{}
 	}
 
 	defer cursor.Close(ctx)
 
 	for cursor.Next(ctx) {
-		var result model.Expense
+		var result model.StockItem
 		if err := cursor.Decode(&result); err != nil {
 			panic(err)
 		}

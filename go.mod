@@ -1,4 +1,4 @@
-module github.com/IgorCooli/xpense
+module github.com/IgorCooli/minha-cozinha-be
 
 go 1.22.0
 
