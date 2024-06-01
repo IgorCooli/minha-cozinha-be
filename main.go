@@ -5,8 +5,11 @@ import (
 	"os"
 	"time"
 
+	shoppingListHandler "github.com/IgorCooli/minha-cozinha-be/api/shoppingList"
 	stockHandler "github.com/IgorCooli/minha-cozinha-be/api/stock"
+	shoppingListService "github.com/IgorCooli/minha-cozinha-be/internal/business/service/shoppingList"
 	stockService "github.com/IgorCooli/minha-cozinha-be/internal/business/service/stock"
+	shoppingListRepository "github.com/IgorCooli/minha-cozinha-be/internal/repository/shoppingList"
 	stockRepository "github.com/IgorCooli/minha-cozinha-be/internal/repository/stock"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
@@ -28,6 +31,7 @@ func main() {
 	}))
 
 	injectStockApi(ctx, dbClient, app)
+	injectShoppingListApi(ctx, dbClient, app)
 
 	port := resolveApiPort()
 
@@ -48,9 +52,13 @@ func injectStockApi(ctx context.Context, dbClient *mongo.Client, app *fiber.App)
 	stockRepository := stockRepository.NewRepository(dbClient)
 	stockService := stockService.NewService(stockRepository)
 	stockHandler.NewHandler(ctx, stockService, app)
-	// expenseRepository := stock.NewRepository()
-	// expenseService := expenseService.NewService(expenseRepository)
-	// expenseApi.NewHandler(ctx, expenseService, app)
+}
+
+func injectShoppingListApi(ctx context.Context, dbClient *mongo.Client, app *fiber.App) {
+
+	shoppingListRepository := shoppingListRepository.NewRepository(dbClient)
+	shoppingListService := shoppingListService.NewService(shoppingListRepository)
+	shoppingListHandler.NewHandler(ctx, shoppingListService, app)
 }
 
 func resolveApiPort() string {

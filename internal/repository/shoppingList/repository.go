@@ -1,4 +1,4 @@
-package stock
+package shoppingList
 
 import (
 	"context"
@@ -18,7 +18,7 @@ type Repository interface {
 
 func NewRepository(client *mongo.Client) Repository {
 	return mongoRepository{
-		stockDB: client.Database("TCCMongoDB").Collection("stock"),
+		stockDB: client.Database("TCCMongoDB").Collection("shopping-list"),
 	}
 }
 

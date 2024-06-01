@@ -50,7 +50,7 @@ func (h handler) SearchStock(c fiber.Ctx) error {
 }
 
 func (h handler) AddStock(c fiber.Ctx) error {
-	var body model.StockItem
+	var body model.Item
 	json.Unmarshal(c.Body(), &body)
 
 	h.service.AddStock(c.Context(), body)

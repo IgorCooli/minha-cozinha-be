@@ -9,8 +9,8 @@ import (
 )
 
 type Service interface {
-	AddStock(ctx context.Context, expense model.StockItem) error
-	Search(ctx context.Context, name string) []model.StockItem
+	AddStock(ctx context.Context, expense model.Item) error
+	Search(ctx context.Context, name string) []model.Item
 	RemoveStockItem(ctx context.Context, id string) error
 }
 
@@ -24,7 +24,7 @@ func NewService(repository stock.Repository) Service {
 	}
 }
 
-func (s service) AddStock(ctx context.Context, stockItem model.StockItem) error {
+func (s service) AddStock(ctx context.Context, stockItem model.Item) error {
 
 	stockItem.Id = uuid.New().String()
 
@@ -33,11 +33,11 @@ func (s service) AddStock(ctx context.Context, stockItem model.StockItem) error 
 	return nil
 }
 
-func (s service) Search(ctx context.Context, name string) []model.StockItem {
+func (s service) Search(ctx context.Context, name string) []model.Item {
 	result := s.repository.Search(ctx, name)
 
 	if result == nil {
-		return []model.StockItem{}
+		return []model.Item{}
 	}
 
 	return result
