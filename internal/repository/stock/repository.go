@@ -13,6 +13,7 @@ type Repository interface {
 	InsertOne(ctx context.Context, expense model.StockItem) error
 	InsertMany(ctx context.Context, expenses []model.StockItem) error
 	Search(ctx context.Context, name string) []model.StockItem
+	RemoveItem(ctx context.Context, id string) error
 }
 
 func NewRepository(client *mongo.Client) Repository {
@@ -78,4 +79,14 @@ func (r mongoRepository) Search(ctx context.Context, name string) []model.StockI
 	}
 
 	return results
+}
+
+func (r mongoRepository) RemoveItem(ctx context.Context, id string) error {
+	filter := bson.D{
+		{"id", id},
+	}
+
+	_, err := r.stockDB.DeleteOne(ctx, filter)
+
+	return err
 }

@@ -23,6 +23,7 @@ func NewHandler(ctx context.Context, service stock.Service, app *fiber.App) hand
 	app.Get("/", handler.HelloWorld)
 	app.Get("/stock/search", handler.SearchStock)
 	app.Post("/stock", handler.AddStock)
+	app.Delete("/stock/:id", handler.RemoveStockItem)
 
 	return handler
 }
@@ -53,6 +54,15 @@ func (h handler) AddStock(c fiber.Ctx) error {
 	json.Unmarshal(c.Body(), &body)
 
 	h.service.AddStock(c.Context(), body)
+
+	return nil
+}
+
+func (h handler) RemoveStockItem(c fiber.Ctx) error {
+
+	stockItemId := c.Params("id")
+
+	h.service.RemoveStockItem(c.Context(), stockItemId)
 
 	return nil
 }
