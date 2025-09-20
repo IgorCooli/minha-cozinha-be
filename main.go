@@ -39,12 +39,12 @@ func main() {
 }
 
 func setupDb(ctx context.Context) *mongo.Client {
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb+srv://admin:mongodb159@tccmongodb.3ud5x.mongodb.net/?retryWrites=true&w=majority&appName=TCCMongoDB"))
-	if err != nil {
-		panic("Could not connect to dabase")
-	}
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://admin:admin@localhost:27017/?authSource=admin"))
+    if err != nil {
+        panic("Could not connect to database")
+    }
 
-	return client
+    return client
 }
 
 func injectStockApi(ctx context.Context, dbClient *mongo.Client, app *fiber.App) {
@@ -64,7 +64,7 @@ func injectShoppingListApi(ctx context.Context, dbClient *mongo.Client, app *fib
 func resolveApiPort() string {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "3000"
+		port = "7000"
 	}
 	return port
 }

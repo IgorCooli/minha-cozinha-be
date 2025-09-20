@@ -18,7 +18,7 @@ type Repository interface {
 
 func NewRepository(client *mongo.Client) Repository {
 	return mongoRepository{
-		stockDB: client.Database("TCCMongoDB").Collection("shopping-list"),
+		stockDB: client.Database("minha-cozinha").Collection("shopping-list"),
 	}
 }
 
